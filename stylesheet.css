@@ -1,0 +1,117 @@
+/*
+  Ryosei Tamura - personal website
+  Header: large name with a one-line subtitle, the bio on the left, a rounded portrait on the right,
+  and a row of icon links under the bio. Below it: News and a numbered Publications list.
+  The layout uses CSS grid, and colors follow the visitor's light / dark system setting.
+*/
+
+:root {
+  --bg: #fff;
+  --text: #111;
+  --muted: #5f6368;
+  --link: #1772d0;
+  --link-hover: #f09228;
+  --rule: #e5e5e5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161616;
+    --text: #e6e6e6;
+    --muted: #a8adb3;
+    --link: #4ea1f7;
+    --link-hover: #f0a050;
+    --rule: #333;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Lato', Verdana, Helvetica, sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+a { color: var(--link); text-decoration: none; }
+a:hover, a:focus { color: var(--link-hover); text-decoration: underline; }
+
+p { margin: 0 0 10px; }
+
+.page { max-width: 800px; margin: 0 auto; padding-bottom: 24px; }
+
+/* ---------- Header: name on top, bio left, photo right ---------- */
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 30%;
+  grid-template-areas:
+    "title title"
+    "bio   photo";
+  column-gap: 28px;
+  padding: 36px 16px 14px;
+}
+.title { grid-area: title; margin-bottom: 18px; }
+.bio   { grid-area: bio; }
+.photo { grid-area: photo; }
+
+.name {
+  margin: 0;
+  font-size: 42px;
+  font-weight: 300;
+  line-height: 1.15;
+}
+.name .first { font-weight: 700; }
+
+.subtitle { margin: 6px 0 0; font-size: 16px; color: var(--muted); }
+.subtitle .part { white-space: nowrap; }   /* if the line wraps, it breaks at the dot */
+.subtitle .dot { margin: 0 4px; }
+
+.photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: 50% 30%;
+  border-radius: 10px;
+}
+
+.social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin: 16px 0 0;
+  font-size: 26px;
+  line-height: 1;
+}
+.social a:hover, .social a:focus { text-decoration: none; }
+
+/* ---------- Sections ---------- */
+.section { padding: 6px 16px 10px; }
+h2 {
+  margin: 0 0 10px;
+  padding-bottom: 5px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border-bottom: 1px solid var(--rule);
+}
+ul, ol { margin: 0; padding-left: 20px; }
+li { margin-bottom: 6px; }
+
+/* ---------- Phones: the photo floats right and the bio wraps around it ---------- */
+@media (max-width: 480px) {
+  .header { display: block; padding: 24px 16px 6px; }
+  .header::after { content: ""; display: block; clear: both; }
+  .title { margin-bottom: 14px; }
+  .name { font-size: 32px; }
+  .subtitle { font-size: 15px; }
+  .subtitle .part { display: block; }   /* phones: position and lab on two lines */
+  .subtitle .dot { display: none; }
+  .photo { float: right; width: 38%; max-width: 150px; margin: 4px 0 8px 14px; }
+  .social { gap: 8px 18px; font-size: 24px; }
+}
