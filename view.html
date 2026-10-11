@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Ryosei Tamura</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <!--
+    PDF viewer page. Shows a PDF from data/ as pages in the browser (using Mozilla's PDF.js from cdnjs),
+    so visitors view it instead of downloading it. Which PDFs it may show is fixed in DOCS below;
+    link to it as view.html?doc=<key>, e.g. view.html?doc=cv.
+  -->
+  <style>
+    :root { --bg: #f1f1f1; --bar: #fff; --text: #111; --muted: #5f6368; --link: #1772d0; --link-hover: #f09228; --rule: #e5e5e5; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #0e0e0e; --bar: #161616; --text: #e6e6e6; --muted: #a8adb3; --link: #4ea1f7; --link-hover: #f0a050; --rule: #333; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Lato', Verdana, Helvetica, sans-serif; font-size: 15px; }
+    a { color: var(--link); text-decoration: none; }
+    a:hover, a:focus { color: var(--link-hover); text-decoration: underline; }
+    .bar {
+      position: sticky; top: 0; z-index: 2;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 10px 16px; background: var(--bar); border-bottom: 1px solid var(--rule);
+    }
+    .bar .doc-title { color: var(--muted); }
+    #pages { max-width: 920px; margin: 20px auto 40px; padding: 0 12px; display: flex; flex-direction: column; gap: 16px; }
+    .page { position: relative; background: #fff; box-shadow: 0 1px 6px rgba(0, 0, 0, .25); }
+    .page canvas { display: block; width: 100%; height: auto; }
+    .page a.pdf-link { position: absolute; display: block; }
+    .page a.pdf-link:hover { background: rgba(23, 114, 208, .12); text-decoration: none; }
+    .msg { text-align: center; color: var(--muted); padding: 48px 16px; }
+    @media (max-width: 480px) { .bar .doc-title { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <a href="./">&larr; Ryosei Tamura</a>
+    <span class="doc-title" id="doc-title"></span>
+    <a id="download" href="#" download>Download PDF</a>
+  </div>
+  <main id="pages"><p class="msg" id="msg">Loading&hellip;</p></main>
+
+  <script type="module">
+    import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.4.299/pdf.min.mjs";
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.4.299/pdf.worker.min.mjs";
+
+    // The only documents this page will show.
+    const DOCS = {
+      "cv": { file: "data/cv.pdf", title: "CV" },
+      "riss-2026-paper": { file: "data/riss-2026-paper.pdf", title: "Multi-Modal Demonstrations for Dexterous Manipulation (RISS 2026)" },
+    };
+
+    const msg = document.getElementById("msg");
+    const pagesEl = document.getElementById("pages");
+    const doc = DOCS[new URLSearchParams(location.search).get("doc")];
+
+    if (!doc) {
+      msg.textContent = "Document not found.";
+    } else {
+      document.title = `${doc.title} | Ryosei Tamura`;
+      document.getElementById("doc-title").textContent = doc.title;
+      document.getElementById("download").href = doc.file;
+      try {
+        const pdf = await pdfjsLib.getDocument({ url: doc.file }).promise;
+        msg.remove();
+        const RENDER_WIDTH = 1800;   // pixels; drawn once at high resolution, then scaled to fit the screen
+        for (let n = 1; n <= pdf.numPages; n++) {
+          const page = await pdf.getPage(n);
+          const base = page.getViewport({ scale: 1 });
+          const viewport = page.getViewport({ scale: RENDER_WIDTH / base.width });
+          const wrap = document.createElement("div");
+          wrap.className = "page";
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.floor(viewport.width);
+          canvas.height = Math.floor(viewport.height);
+          canvas.setAttribute("role", "img");
+          canvas.setAttribute("aria-label", `Page ${n} of ${pdf.numPages}`);
+          wrap.appendChild(canvas);
+          pagesEl.appendChild(wrap);
+          await page.render({ canvas, viewport }).promise;
+
+          // Keep the PDF's own web links clickable (e.g. email, LinkedIn). Skipped quietly if anything goes wrong.
+          try {
+            const [ta, tb, tc, td, te, tf] = viewport.transform;
+            const toScreen = (x, y) => [ta * x + tc * y + te, tb * x + td * y + tf];
+            for (const a of await page.getAnnotations()) {
+              if (a.subtype !== "Link" || !a.url) continue;
+              const [x1, y1] = toScreen(a.rect[0], a.rect[1]);
+              const [x2, y2] = toScreen(a.rect[2], a.rect[3]);
+              const link = document.createElement("a");
+              link.className = "pdf-link";
+              link.href = a.url;
+              link.target = "_blank";
+              link.rel = "noopener";
+              link.title = a.url;
+              Object.assign(link.style, {
+                left: `${(Math.min(x1, x2) / viewport.width) * 100}%`,
+                top: `${(Math.min(y1, y2) / viewport.height) * 100}%`,
+                width: `${(Math.abs(x2 - x1) / viewport.width) * 100}%`,
+                height: `${(Math.abs(y2 - y1) / viewport.height) * 100}%`,
+              });
+              wrap.appendChild(link);
+            }
+          } catch (linkErr) {
+            console.warn("PDF links not added:", linkErr);
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        msg.innerHTML = "";
+        msg.append("This document could not be shown here. ");
+        const a = document.createElement("a");
+        a.href = doc.file;
+        a.textContent = "Open the PDF";
+        msg.append(a, ".");
+      }
+    }
+  </script>
+</body>
+</html>

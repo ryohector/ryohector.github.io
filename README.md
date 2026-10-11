@@ -15,7 +15,8 @@ Colors follow the visitor's system setting: light by default, dark when their de
 | `images/profile.jpg` | Headshot shown on the page: an 800x1000 crop of the original photo. |
 | `images/ryosei_tamura01.jpg` | Original photo. Clicking the headshot opens it. |
 | `images/*-poster.jpg` | Posters, linked as images so every browser shows them instead of downloading a PDF. |
-| `data/` | PDFs the page links to: the RISS 2026 paper. Put your CV here as `cv.pdf`. |
+| `view.html` | PDF viewer page (Mozilla PDF.js). Links like `view.html?doc=cv` show a PDF from `data/` as pages instead of downloading it. To add a PDF, put it in `data/` and add a line to the `DOCS` list in `view.html`. |
+| `data/` | PDFs shown through `view.html`: the RISS 2026 paper and your CV (`cv.pdf`). |
 | `.nojekyll` | Tells GitHub Pages to serve the files verbatim. |
 
 ## Preview locally
