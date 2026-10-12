@@ -31,7 +31,7 @@
   2. News: one <li> per item, newest first.
   3. Publications: one <li> per paper, newest first. Put <strong> around your own name.
      Posters are linked as JPEG images (images/*-poster.jpg) and PDFs through view.html, so nothing downloads when clicked.
-  CV: the CV icon is commented out until you add data/cv.pdf.
+  CV: data/cv.pdf, opened through view.html?doc=cv. To update it, replace data/cv.pdf with the new PDF.
 -->
 <main class="page">
 
@@ -67,9 +67,7 @@
       </p>
       <p class="social">
         <a href="mailto:ryoseitamura@gmail.com" aria-label="Email" title="Email"><i class="fa-solid fa-envelope"></i></a>
-        <!-- CV icon: hidden until data/cv.pdf exists. To show it, delete this comment wrapper.
-        <a href="data/cv.pdf" aria-label="CV" title="CV"><i class="ai ai-cv"></i></a>
-        -->
+        <a href="view.html?doc=cv" aria-label="CV" title="CV"><i class="ai ai-cv"></i></a>
         <a href="https://scholar.google.com/citations?user=OoCWHXkAAAAJ&amp;hl=en" aria-label="Google Scholar" title="Google Scholar"><i class="ai ai-google-scholar"></i></a>
         <a href="https://github.com/ryohector" aria-label="GitHub" title="GitHub"><i class="fa-brands fa-github"></i></a>
         <a href="https://x.com/ryoseitamura39" aria-label="X" title="X"><i class="fa-brands fa-x-twitter"></i></a>
