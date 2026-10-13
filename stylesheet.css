@@ -66,6 +66,7 @@ p { margin: 0 0 10px; }
   line-height: 1.15;
 }
 .name .first { font-weight: 700; }
+.name .native { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif; font-weight: 300; white-space: nowrap; }
 
 .subtitle { margin: 6px 0 0; font-size: 16px; color: var(--muted); }
 .subtitle .part { white-space: nowrap; }   /* if the line wraps, it breaks at the dot */
